@@ -2,20 +2,16 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("API OK");
+const PORT = process.env.PORT || 8080;
+
+app.post("/generate", async (req, res) => {
+    const prompt = req.body.prompt;
+    // Ici, tu appelles OpenAI pour générer le texte
+    const result = `Vous avez écrit: ${prompt}`; // test temporaire
+    res.json({ result });
 });
 
-app.post("/generate", (req, res) => {
-  const { prompt } = req.body;
-  res.json({ result: "Reçu : " + prompt });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
