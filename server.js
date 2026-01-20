@@ -1,18 +1,33 @@
-require("dotenv").config();           // charge les variables d'environnement
-const express = require("express");   // serveur web
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Stripe sécurisé
-const OpenAI = require("openai");     // OpenAI API
+import express from "express";
+import cors from "cors";
 
 const app = express();
+
+// Middlewares
+app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// Route test pour vérifier que le serveur fonctionne
+// Route test (OBLIGATOIRE)
 app.get("/", (req, res) => {
-  res.send("Backend IA opérationnel !");
+  res.send("Backend IA opérationnel 🚀");
 });
 
-// Démarrage du serveur
+// Route IA
+app.post("/api/generate", async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt manquant" });
+  }
+
+  // TEST SIMPLE (sans IA pour l’instant)
+  res.json({
+    result: `Réponse IA simulée pour : "${prompt}"`
+  });
+});
+
+// ⚠️ PORT RAILWAY (CRITIQUE)
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
