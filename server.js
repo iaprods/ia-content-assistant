@@ -1,60 +1,18 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const axios = require("axios");
-const Stripe = require("stripe");
-require("dotenv").config();
+require("dotenv").config();           // charge les variables d'environnement
+const express = require("express");   // serveur web
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Stripe sécurisé
+const OpenAI = require("openai");     // OpenAI API
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Route test simple
+// Route test pour vérifier que le serveur fonctionne
 app.get("/", (req, res) => {
-  res.json({ status: "online", message: "ProdIA backend running" });
+  res.send("Backend IA opérationnel !");
 });
 
-// Route création contenu IA
-app.post("/api/message", async (req, res) => {
-  try {
-    const { message } = req.body;
-
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-5-mini",
-        messages: [{ role: "user", content: message }],
-        max_tokens: 500
-      },
-      {
-        headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` }
-      }
-    );
-
-    res.json({ reply: response.data.choices[0].message.content });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur IA" });
-  }
-});
-
-// Route Stripe Checkout pour abonnement / crédits
-app.post("/api/checkout", async (req, res) => {
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      success_url: "https://tonfrontend.com/success",
-      cancel_url: "https://tonfrontend.com/cancel"
-    });
-    res.json({ url: session.url });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur Stripe" });
-  }
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`ProdIA backend running on port ${port}`));
+// Démarrage du serveur
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
