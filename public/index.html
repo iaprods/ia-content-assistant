@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Génération IA</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    textarea { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 10px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    pre { background: #eee; padding: 10px; white-space: pre-wrap; word-wrap: break-word; }
+    h1, h2 { font-family: 'Space Grotesk', sans-serif; }
+  </style>
+</head>
+<body>
+  <h1>Tester IA /generate</h1>
+  <textarea id="prompt" rows="4" placeholder="Écris ton prompt ici..."></textarea><br>
+  <button id="sendBtn">Générer</button>
+  <h2>Résultat :</h2>
+  <pre id="result"></pre>
+
+  <script>
+    const btn = document.getElementById('sendBtn');
+    btn.onclick = async () => {
+      const prompt = document.getElementById('prompt').value;
+      if (!prompt) return alert("Écris un prompt !");
+
+      try {
+        const res = await fetch(ia-content-assistant-production.up.railway.app/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        if (!res.ok) throw new Error("Erreur serveur : " + res.status);
+
+        const data = await res.json();
+        document.getElementById('result').textContent = data.result || JSON.stringify(data);
+      } catch (err) {
+        document.getElementById('result').textContent = "Erreur : " + err.message;
+      }
+    };
+  </script>
+</body>
+</html>
